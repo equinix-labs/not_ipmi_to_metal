@@ -40,7 +40,6 @@ elif METAL_SERVER_UUID is None:
     sys.exit(1)
 
 manager = packet.Manager(auth_token=METAL_AUTH_TOKEN)
-server = manager.get_device(METAL_SERVER_UUID)
 
 
 class FakeBmc(Bmc):
@@ -89,12 +88,6 @@ class FakeBmc(Bmc):
         elif server.state == 'inactive':
             self.powerstate = 'off'
         return self.powerstate
-            
-        #else:
-        #    self.powerstate ='unknown'
-        #    logger.error('Could nort processes server state')
-    
-        
 
     def power_off(self):
         server = manager.get_device(METAL_SERVER_UUID)
@@ -109,8 +102,7 @@ class FakeBmc(Bmc):
                 server.power_off()
                 self.powerstate = 'on'
             except packet.baseapi.ResponseError as e:
-                logger.error('Metal API returned %s as error to power OFF request'
-                % e)
+                logger.error('Metal API returned %s as error to power OFF request' % e)
                 self.powerstate = 'unknown'
         elif server.state == 'inactive':
             self.powerstate = 'off'
@@ -118,25 +110,22 @@ class FakeBmc(Bmc):
         else:
             logger.debug('Metal server will return state unknown, expected')
             self.powerstate = 'unknown'
-        
-        #return self.powerstate
-        #self.powerstate = 'off'
 
     def power_on(self):
         server = manager.get_device(METAL_SERVER_UUID)
         logger.info('IPMI BMC Power_On request.')
         logger.info('Metal Server State: %s' % server.state)
         # IPMI will ask to turn a server on but expect a return of "off" till it is "on"
-        # Chassis Power Control: Down/On 
+        # Chassis Power Control: Down/On
         if server.state == 'active':
             self.powerstate = 'on'
             logger.debug('Metal server is already on')
         elif server.state == 'inactive':
-            try: 
+            try:
                 logger.info('Metal API: power ON %s', METAL_SERVER_UUID)
                 server.power_on()
             except packet.baseapi.ResponseError as e:
-                logging.error('Metal API returned %s as error to power ON request' % e)
+                logger.error('Metal API returned %s as error to power ON request' % e)
                 self.powerstate = 'unknown'
         else:
             self.powerstate = 'unknown'
@@ -151,7 +140,7 @@ class FakeBmc(Bmc):
                 logger.debug('Metal Server: is OFF for Power_Reset call, issuing power ON')
                 self.powerstate = 'on'
             except packet.baseapi.ResponseError as e:
-                logging.error('Metal API returned %s as error to power ON request' % e)
+                logger.error('Metal API returned %s as error to power ON request' % e)
                 self.powerstate = 'unknown'
         else:
             logger.debug('Metal API: REBOOT server')
@@ -168,7 +157,7 @@ class FakeBmc(Bmc):
                 logger.debug('Metal Server: is OFF for Power_Cycle call, issuing power ON')
                 self.powerstate = 'on'
             except packet.baseapi.ResponseError as e:
-                logging.error('Metal API returned %s as error to power ON request' % e)
+                logger.error('Metal API returned %s as error to power ON request' % e)
                 self.powerstate = 'unknown'
         else:
             logger.debug('Metal API: REBOOT server')
