@@ -37,3 +37,7 @@ To make this more concrete, consider the following three IPMI requests and how t
 ### Opinionated Deployment
   * `not_ipmi_to_metal` is currently operationally laborious and extemely fragile. As a better understanding of how it would deployed is reached, it could become significantly more intelligent about autoconfiguration, potentially pursuing tags or another means of gleaning data for self configuration. 
 
+### Other Projects
+
+The OpenStack project has it's ["Virtual BMC"](https://github.com/openstack/virtualbmc) project which can also be poked and proded for inspiration. 
+
