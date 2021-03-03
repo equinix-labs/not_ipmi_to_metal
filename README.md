@@ -2,6 +2,8 @@
 
 `not_ipmi_to_metal` is a fake IPMI server / ednpoint that takes the hard work and logic from [shapeblue/ipmisim](https://github.com/shapeblue/ipmisim) and wraps+extends it in a way as to function as a "inbound IPMI request to Metal API / SSH / openipmi / other" proxy.
 
+To be explicit, the code quality of this repo should be considered *terrible*. This repo is purely for exploratory and collaborative purposes.
+
 [Quick Deployment Guide](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/snippets/deployment.md)
 
 [Development Intent](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/snippets/development.md)
