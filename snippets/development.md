@@ -3,6 +3,11 @@
 
 Currently, the relevant logic is predominantly in [fakebmc.py](ipmi_to_metal/fakebmc.py), where we can suprisingly quite easily, shove our own logic into the middle of [ipmisim's](https://github.com/shapeblue/ipmisim) BMC / Session handling. This allows us to quickly and easily mock different actions.
 
+### Short-term Todos
+
+* Add `fakebmc.py` shim to support updating a Metal instance's configuration in the platform between iPXE always configurations with a defined iPXE URL specified as  OSENV. This will allow an IPMI call to mimic setting a device to PXE boot and handing off control of the instance to an install chain
+* Make IPMI credentials OSENV based
+
 
 ### Target endpoints / abstractions
 
