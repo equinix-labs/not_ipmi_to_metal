@@ -1,4 +1,4 @@
-`not_ipmi_to_metal` is intended to be a brush clearing, investigative project to discover and tackle domain speific implementation concerns as are discovered, in anticipation of a more formal, more polished `ipmi_to_metal` project pursuit down the road. The code and glue in this repo is wild wild west by design, as it will likely have to be re-written or re-packaged several times in the pursuit of a better implementation as it's is pursued with more applied test deployments.
+`not_ipmi_to_metal` is intended to be a brush clearing, hackathon project. The code and glue in this repo is wild wild west by design, as it will likely have to be re-written or re-packaged several times in the pursuit of a better implementation as it's is pursued with more applied test deployments.
 
 
 Currently, the relevant logic is predominantly in [fakebmc.py](ipmi_to_metal/fakebmc.py), where we can suprisingly quite easily, shove our own logic into the middle of [ipmisim's](https://github.com/shapeblue/ipmisim) BMC / Session handling. This allows us to quickly and easily mock different actions.
@@ -32,8 +32,8 @@ To make this more concrete, consider the following three IPMI requests and how t
   * Could call the Metal API directly to forcefully poweroff the host regadless of other state
 
 ### Security
-  * By design, `ipmi_to_metal` would insert itself in a high risk management domain, with priviledged credentials and sensitive operations. `not_ipmi_to_metal` should be a security aware project from the beginning as it develops.
+  * By design, `ipmi_to_metal` would insert itself in a high risk management domain, with privileged  credentials and sensitive operations. `not_ipmi_to_metal` should be a security aware project from the beginning as it develops.
 
 ### Opinionated Deployment
-  * `not_ipmi_to_metal` is currently operationally laborious and extemely fragile. As a better understanding of how it would deployed is reached, it could become significantly more intelligent about autoconfiguration, potentially pursuing tags or another means of gleaning data for self configuration. 
+  * `not_ipmi_to_metal` is currently operationally laborious and extremely fragile. As a better understanding of how it would deployed is reached, it could become significantly more intelligent about autoconfiguration, potentially pursuing tags or another means of gleaning data for self configuration. 
 

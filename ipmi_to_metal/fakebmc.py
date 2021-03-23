@@ -32,11 +32,15 @@ logger.addHandler(ch)
 
 METAL_AUTH_TOKEN = os.getenv("METAL_AUTH_TOKEN")
 METAL_SERVER_UUID = os.getenv("METAL_SERVER_UUID")
+METAL_SERVER_IPXE_URL = os.getenv("METAL_SERVER_IPXE_URL")
 if METAL_AUTH_TOKEN is None:
     logger.error("OS ENV variable METAL_AUTH_TOKEN= must be set")
     sys.exit(1)
 elif METAL_SERVER_UUID is None:
     logger.error("OS ENV variable METAL_SERVER_UUID= must be set")
+    sys.exit(1)
+elif METAL_SERVER_IPXE_URL is None:
+    logger.error("OS ENV variable METAL_SERVER_IPXE_URL= must be set")
     sys.exit(1)
 
 manager = packet.Manager(auth_token=METAL_AUTH_TOKEN)
@@ -65,13 +69,28 @@ class FakeBmc(Bmc):
         return self.bootdevice
 
     def set_boot_device(self, bootdevice):
+        server = manager.get_device(METAL_SERVER_UUID)
         logger.info('IPMI BMC Set_Boot_Device request.')
+        logger.info('IPMI BMC bootdevice request is for %s' % bootdevice)
+        logger.info('Metal Server PXE state is %s' % server.always_pxe)
+        if bootdevice == 'network':
+            logger.info('Metal Server iPXE URL being set to: %s' % METAL_SERVER_IPXE_URL)
+            logger.info('Metal Server always_ipxe being set to True')
+            server.ipxe_script_url = METAL_SERVER_IPXE_URL
+            server.always_pxe = True
+            server.update()
+        if bootdevice == 'hd':
+            logger.info('Metal Server always_ipxe being set to False')
+            server.always_pxe = False
+            server.update()
         self.bootdevice = bootdevice
 
     def cold_reset(self):
+        server = manager.get_device(METAL_SERVER_UUID)
         logger.info('IPMI BMC Cold_Reset request.')
+        server.reboot()
         self.powerstate = 'off'
-        self.bootdevice = 'default'
+        #self.bootdevice = 'default'
 
     def get_power_state(self):
         server = manager.get_device(METAL_SERVER_UUID)

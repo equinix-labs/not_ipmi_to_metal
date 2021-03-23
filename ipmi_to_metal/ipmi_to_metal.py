@@ -16,7 +16,6 @@
 # C Author: Peter Sooky <xsooky00@stud.fit.vubtr.cz>
 # Brno University of Technology, Faculty of Information Technology
 
-import os
 import argparse
 import logging
 
