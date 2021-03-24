@@ -314,6 +314,7 @@ class IpmiServerContext(object):
         self.session.sessionid = struct.unpack('<I', struct.pack('4B', *self.clientsessionid))[0]
 
     def handle_client_request(self, request):
+        logger.error('TOP OF FUNCTION: request is %s' % request)
         authkeys = list(self.authdata.keys())
         if request['netfn'] == 6 and request['command'] == 0x3b:
             # set session privilage level
@@ -431,19 +432,26 @@ class IpmiServerContext(object):
             self.session._send_ipmi_net_payload(code=returncode)
             logger.info('IPMI response sent (Set User Password) to %s', self.session.sockaddr)
         elif request['netfn'] in [0, 6] and request['command'] in [1, 2, 8, 9]:
-            logger.debug('IPMI request netfn is %s,' % str(request['netfn']) + 'request command is %s' % str(request['command']))
+            logger.debug('Hit main handler: IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
             self.bmc.handle_raw_request(request, self.session)
+        elif request['netfn'] in [6] and request['command'] in [66, 65]:
+            logger.error('lol')
+            FakeBmc.custom_handle_raw_request(self, request, self.session)
+            #returncode = 0xc1
+            #self.session._send_ipmi_net_payload(code=returncode)            
         elif request['netfn'] in [44] and request['command'] in [62, 0]:
-            logger.info('IPMI request netfn is %s,' % str(request['netfn']) + 'request command is %s' % str(request['command']))
+            logger.info('IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
             logger.debug('IPMI is asking for user access stuff not yet implemented')
             returncode = 0xc1
             self.session._send_ipmi_net_payload(code=returncode)
         else:
+            logger.warn('IPMI unrecognized command from %s', self.session.sockaddr)
+            logger.warn('IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
+            logger.warn('IPMI request %s', request)
+            logger.warn('IPMI response sent (Invalid Command) to %s', self.session.sockaddr)
             returncode = 0xc1
             self.session._send_ipmi_net_payload(code=returncode)
-            logger.warn('IPMI unrecognized command from %s', self.session.sockaddr)
-            logger.warn('IPMI request netfn is %s,' % str(request['netfn']) + 'request command is %s' % str(request['command']))
-            logger.warn('IPMI response sent (Invalid Command) to %s', self.session.sockaddr)
+
 
 
 class IpmiServer(socketserver.BaseRequestHandler):

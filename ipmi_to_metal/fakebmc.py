@@ -188,3 +188,47 @@ class FakeBmc(Bmc):
     def power_shutdown(self):
         logger.info('IPMI BMC Power_Shutdown request.')
         self.powerstate = 'off'
+    
+    # This is a horrible horrible thing to do
+    # Todo redo all of this
+    # https://opendev.org/x/pyghmi/src/branch/master/pyghmi/ipmi/bmc.py#L162
+    def custom_handle_raw_request(self, request, session):
+        logger.debug('AGAIN command is %s', request['command'])
+        #try:
+        if request['netfn'] == 6:
+            if request["command"] == 0x42:
+                logger.debug('wut')
+                self.session._send_ipmi_net_payload(data=get_channel_info())
+            elif request["command"] == 0x41:
+                logger.debug('WAT')
+                self.session._send_ipmi_net_payload(data=get_channel_settings())
+        #except:
+        #    logger.error('Shouldnt be here')
+        
+        
+#Taken from 
+# https://github.com/kurokobo/virtualbmc-for-vsphere/blob/master/vbmc4vsphere/vbmc.py#L350
+def get_channel_info():
+    logger.debug('Hit channel data son')
+    channel_data = [
+        0x02,  # channel number = 2
+        0x04,  # channel medium type = 802.3 LAN
+        0x01,  # channel protocol type = IPMB-1.0
+        0x80,  # session support = multi-session
+        0xF2,  # vendor id = 7154
+        0x1B,  # vendor id = 7154
+        0x00,  # vendor id = 7154
+        0x00,  # reserved
+        0x00,  # reserved
+    ]
+    return channel_data
+    
+#Taken from 
+# https://github.com/kurokobo/virtualbmc-for-vsphere/blob/master/vbmc4vsphere/vbmc.py#L350
+def get_channel_settings():
+    logger.debug('Hit channel settings CHILD')
+    channel_settings = [
+        0x12,
+        0x04, 
+    ]
+    return channel_settings
