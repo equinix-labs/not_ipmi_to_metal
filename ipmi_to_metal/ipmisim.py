@@ -314,7 +314,7 @@ class IpmiServerContext(object):
         self.session.sessionid = struct.unpack('<I', struct.pack('4B', *self.clientsessionid))[0]
 
     def handle_client_request(self, request):
-        logger.error('TOP OF FUNCTION: request is %s' % request)
+        logger.info('TOP OF HANDLE FUNCTION: request is %s' % request)
         authkeys = list(self.authdata.keys())
         if request['netfn'] == 6 and request['command'] == 0x3b:
             # set session privilage level
@@ -434,7 +434,7 @@ class IpmiServerContext(object):
         elif request['netfn'] in [0, 6] and request['command'] in [1, 2, 8, 9]:
             logger.debug('Hit main handler: IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
             self.bmc.handle_raw_request(request, self.session)
-        elif request['netfn'] in [6] and request['command'] in [66, 65]:
+        elif request['netfn'] in [6, 10] and request['command'] in [66, 65, 16, 17]:
             logger.error('lol')
             FakeBmc.custom_handle_raw_request(self, request, self.session)
             #returncode = 0xc1
