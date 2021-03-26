@@ -235,61 +235,102 @@ class FakeBmc(Bmc):
     # This is a horrible horrible thing to do
     # Todo redo all of this
     # https://opendev.org/x/pyghmi/src/branch/master/pyghmi/ipmi/bmc.py#L162
+
     def custom_handle_raw_request(self, request, session):
-        logger.debug('HIT Custom Handler command is %s', hex(request['command']))
+        logger.debug(' Custom Handler command is %s', str.format('0x{:02X}', int(str(request["command"]), 16)))
         #try:
         if request['netfn'] == 6:
+            # Channel info
             if request["command"] == 0x42: # 0x06 0x42 
-                logger.debug('wut')
                 self.session._send_ipmi_net_payload(data=get_channel_info())
             elif request["command"] == 0x41: # 0x06 0x41 (automatic subcall of 0x42)
-                logger.debug('WAT')
                 self.session._send_ipmi_net_payload(data=get_channel_settings())
         elif request['netfn'] == 10:
+            # fru
             if request["command"] == 0x10: # 0x0a 0x10 (automatic subcall of 0x42)
-                logger.debug('wott')
                 self.session._send_ipmi_net_payload(data=get_fru_inventory_area_info())
             elif request["command"] == 0x11: # 0x0a 0x11 (automatic subcall of 0x42)
+                # all of this is fru print 0, fru list currently still broken
                 zeros_number = len([num for num in request.get("data") if num == 0x00])
-                logger.error(zeros_number)
                 if zeros_number == 3 and 0x08 in request.get("data"):
-                    logger.debug('WAT1')
                     self.session._send_ipmi_net_payload(data=read_fru_data1())                
                 elif zeros_number == 2 and 0x08 in request.get("data") and 0x02 in request.get("data"):
-                    logger.debug('WAT2')
                     self.session._send_ipmi_net_payload(data=read_fru_data2())
                 elif zeros_number == 2 and 0x08 in request.get("data") and 0x20 in request.get("data"):
-                    logger.debug('WAT3')
                     self.session._send_ipmi_net_payload(data=read_fru_data3())
                 elif zeros_number == 2 and 0x08 in request.get("data") and 0x28 in request.get("data"):
-                    logger.debug('WAT4')
                     self.session._send_ipmi_net_payload(data=read_fru_data4())
                 elif zeros_number == 2 and 0x02 in request.get("data") and 0x30 in request.get("data"):
-                    logger.debug('WAT5')
                     self.session._send_ipmi_net_payload(data=read_fru_data5())
                 elif zeros_number == 2 and 0x20 in request.get("data") and 0x30 in request.get("data"):
-                    logger.debug('WAT6')
                     self.session._send_ipmi_net_payload(data=read_fru_data6())                    
                 elif zeros_number == 2 and 0x10 in request.get("data") and 0x50 in request.get("data"):
-                    logger.debug('WAT7')
                     self.session._send_ipmi_net_payload(data=read_fru_data7())
                 elif zeros_number == 2 and 0x60 in request.get("data") and 0x02 in request.get("data"):
-                    logger.debug('WAT8')
                     self.session._send_ipmi_net_payload(data=read_fru_data8())
                 elif zeros_number == 2 and 0x60 in request.get("data") and 0x20 in request.get("data"):
-                    logger.debug('WAT9')
                     self.session._send_ipmi_net_payload(data=read_fru_data9())
                 elif zeros_number == 2 and 0x80 in request.get("data") and 0x20 in request.get("data"):
-                    logger.debug('WAT10')
-                    self.session._send_ipmi_net_payload(data=read_fru_data10())                              
+                    self.session._send_ipmi_net_payload(data=read_fru_data10())
+        elif request['netfn'] == 12:
+            if request["command"] == 0x02: # 0x0c 0x02 
+                zeros_number = len([num for num in request.get("data") if num == 0x00]) 
+                ones_number = len([num for num in request.get("data") if num == 0x01])
+                if zeros_number == 3 and 0x01 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_1())
+                elif zeros_number == 2 and ones_number == 2:
+                    self.session._send_ipmi_net_payload(data=get_lan_2())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x02 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_3())                
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x04 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_4())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x03 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_5())                    
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x06 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_6())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x05 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_7())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x10 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_8())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x07 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_9())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x0a in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_10())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x0b in request.get("data"):
+                    self.session._send_ipmi_net_payload(code=0x80)  # get_lan_11 shortcut                  
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x0c in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_12())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x0d in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_13())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x0e in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_14())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x0f in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_15())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x14 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_16())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x15 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_17())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x16 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_18())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x17 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_19())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x18 in request.get("data"):
+                    self.session._send_ipmi_net_payload(data=get_lan_20())
+                elif zeros_number == 2 and 0x01 in request.get("data") and 0x1a in request.get("data"):
+                    logger.debug('ipmi client request lan print should be complete')
+                    self.session._send_ipmi_net_payload(code=0x80)  # get_lan_21 shortcut    
+                    
         # except:
            # logger.error('Shouldnt be here')
+
+# All of this needs to be rewritten as a map dict lookup for data
+# Include that in an OEM fru / sdr / lan model, potentiall lift phyghmi's 
         
         
 #Taken from 
 # https://github.com/kurokobo/virtualbmc-for-vsphere/blob/master/vbmc4vsphere/vbmc.py#L350
 def get_channel_info():
-    logger.debug('Hit channel data son')
+    logger.debug('get_channel_info requested')
     channel_data = [
         0x02,  # channel number = 2
         0x04,  # channel medium type = 802.3 LAN
@@ -306,7 +347,7 @@ def get_channel_info():
 #Taken from 
 # https://github.com/kurokobo/virtualbmc-for-vsphere/blob/master/vbmc4vsphere/vbmc.py#L350
 def get_channel_settings():
-    logger.debug('Hit channel settings CHILD')
+    logger.debug('get_channel_info_settings requested')
     channel_settings = [
         0x12,
         0x04, 
@@ -314,49 +355,17 @@ def get_channel_settings():
     return channel_settings
     
 def get_fru_inventory_area_info():
-    logger.debug('Hit get_fru_inventory_area_info')
+    logger.debug('get_fru_inventory_area_info requested')
     fru_area_info = [
         0x00,
         0x01,
         0x00,
-        # 0x20,
-        # 0x31,
-        # 0x32,
-        # 0x54,
-        # 0x52,
-        # 0x46,
-        # 0xc4,
-        # 0x4e,
-        # 0x4f,
-        # 0x4e,
-        # 0x45,
-        # 0xcf,
-        # 0x53,
-        # 0x32,
-        # 0x31,
-        # 0x31,
-        # 0x36,
-        # 0x37,
-        # 0x38,
-        # 0x58,
-        # 0x39,
-        # 0x32,
-        # 0x32,
-        # 0x36,
-        # 0x34,
-        # 0x38,
-        # 0x37,
-        # 0xc0,
-        # 0xc0,
-        # 0xc1,
-        # 0x00,
-        # 0x00,
-        # 0x80,
+
     ]
     return fru_area_info
 
 def read_fru_data1():
-    logger.debug('Hit read_fru_data1')
+    logger.debug('read_fru_data1')
     fru_data1 = [
         0x08,
         0x01,
@@ -371,7 +380,6 @@ def read_fru_data1():
     return fru_data1
 
 def read_fru_data2():
-    logger.debug('Hit read_fru_data2')
     fru_data2 = [
         0x02,
         0x01,
@@ -380,7 +388,6 @@ def read_fru_data2():
     return fru_data2
     
 def read_fru_data3():
-    logger.debug('Hit read_fru_data3')
     fru_data3 = [
         0x20,
         0x01,
@@ -419,7 +426,6 @@ def read_fru_data3():
     return fru_data3
 
 def read_fru_data4():
-    logger.debug('Hit read_fru_data4')
     fru_data4 = [
         0x08,
         0x34,
@@ -435,7 +441,6 @@ def read_fru_data4():
     return fru_data4
 
 def read_fru_data5():
-    logger.debug('Hit read_fru_data5')
     fru_data5 = [
         0x02,
         0x01,
@@ -444,7 +449,6 @@ def read_fru_data5():
     return fru_data5
     
 def read_fru_data6():
-    logger.debug('Hit read_fru_data6')
     fru_data6 = [
         0x20,
         0x01,
@@ -483,7 +487,6 @@ def read_fru_data6():
     return fru_data6
     
 def read_fru_data7():
-    logger.debug('Hit read_fru_data7')
     fru_data7 = [
         0x10,
         0x32,
@@ -506,7 +509,6 @@ def read_fru_data7():
     return fru_data7
 
 def read_fru_data8():
-    logger.debug('Hit read_fru_data8')
     fru_data8 = [
         0x02,
         0x01,
@@ -515,7 +517,6 @@ def read_fru_data8():
     return fru_data8
     
 def read_fru_data9():
-    logger.debug('Hit read_fru_data9')
     fru_data9 = [
         0x20,
         0x01,
@@ -554,7 +555,7 @@ def read_fru_data9():
     return fru_data9
     
 def read_fru_data10():
-    logger.debug('Hit read_fru_data10')
+    logger.debug('read_fru_data10 reached, `fru print 0` should be complete')
     fru_data10 = [
         0x20,
         0x31,
@@ -591,3 +592,212 @@ def read_fru_data10():
         0x80,
     ]
     return fru_data10
+
+def get_lan_1():
+    lan_data1 = [
+        0x11,
+        0x00,
+    ]
+    return lan_data1
+    
+def get_lan_2():
+    lan_data2 = [
+        0x11,
+        0x17,
+    ]
+    return lan_data2
+    
+def get_lan_3():
+    lan_data3 = [
+        0x11,
+        0x16,
+        0x16,
+        0x16,
+        0x16,
+        0x16,        
+    ]
+    return lan_data3
+    
+def get_lan_4():
+    lan_data4 = [
+        0x11,
+        0x02, 
+    ]
+    return lan_data4
+    
+def get_lan_5():
+    lan_data5 = [
+        0x11,
+        0x0a,
+        0xfa,
+        0x1f, 
+        0x7a,        
+    ]
+    return lan_data5
+
+def get_lan_6():
+    lan_data6 = [
+        0x11,
+        0xff,
+        0xff,
+        0xff, 
+        0x00,        
+    ]
+    return lan_data6
+    
+def get_lan_7():
+    lan_data7 = [
+        0x11,
+        0xac,
+        0x1f,
+        0x6b, 
+        0x7f,        
+        0x44, 
+        0xfa,                
+    ]
+    return lan_data7
+    
+def get_lan_8():
+    lan_data8 = [
+        0x11,
+        0x70,
+        0x75,
+        0x62, 
+        0x6c,        
+        0x69, 
+        0x63,
+        0x00,
+        0x00,        
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,        
+        0x00,
+        0x00,
+        0x00,
+        0x00,       
+    ]
+    return lan_data8
+    
+def get_lan_9():
+    lan_data9 = [
+        0x11,
+        0x00,
+        0x00,
+        0x00, 
+        0x00,        
+    ]
+    return lan_data9
+    
+def get_lan_10():
+    lan_data10 = [
+        0x11,
+        0x02,       
+    ]
+    return lan_data10
+
+def get_lan_12():
+    lan_data12 = [
+        0x11,
+        0x0a,
+        0xfa,
+        0x1f,
+        0x01,        
+    ]
+    return lan_data12
+
+def get_lan_13():
+    lan_data13 = [
+        0x11,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,        
+    ]
+    return lan_data13
+
+def get_lan_14():
+    lan_data14 = [
+        0x11,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+    ]
+    return lan_data14
+
+def get_lan_15():
+    lan_data15 = [
+        0x11,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,        
+    ]
+    return lan_data15
+
+def get_lan_16():
+    lan_data16 = [
+        0x11,
+        0x00,
+        0x00,
+    ]
+    return lan_data16
+    
+def get_lan_17():
+    lan_data17 = [
+        0x11,
+        0x00,
+    ]
+    return lan_data17    
+    
+def get_lan_18():
+    lan_data18 = [
+        0x11,
+        0x08,
+    ]
+    return lan_data18
+    
+def get_lan_19():
+    lan_data19 = [
+        0x11,
+        0x00,
+        0x01,
+        0x02,
+        0x03,
+        0x06,
+        0x07,
+        0x08,
+        0x0b,
+        0x0c,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,       
+    ]
+    return lan_data19
+
+def get_lan_20():
+    lan_data20 = [
+        0x11,
+        0x00,
+        0x40,
+        0x44,
+        0x00,
+        0x44,
+        0x04,
+        0x40,
+        0x04,
+        0x00,
+    ]
+    return lan_data20

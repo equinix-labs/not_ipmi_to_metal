@@ -39,6 +39,7 @@ This doc is intended to provide a deployment guide for the not_ipmi_to_metal ser
         docker run -d --name ipmi_to_metal_$SERVER_HUMAN_NAME \
 		-e METAL_AUTH_TOKEN=$METAL_AUTH_TOKEN \
 		-e METAL_SERVER_UUID=$METAL_SERVER_UUID \
+		-e METAL_SERVER_IPXE_URL=$METAL_SERVER_IPXE_URL \
         -p $(ELASTIC_IP_HERE):623:623/udp \
         ipmi_to_metal:latest
         ```

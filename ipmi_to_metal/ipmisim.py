@@ -314,7 +314,9 @@ class IpmiServerContext(object):
         self.session.sessionid = struct.unpack('<I', struct.pack('4B', *self.clientsessionid))[0]
 
     def handle_client_request(self, request):
-        logger.info('TOP OF HANDLE FUNCTION: request is %s' % request)
+        logger.debug('TOP OF HANDLE FUNCTION: request is %s' % request)
+        # TODO This is horrible
+        logger.debug('TOP OF HANDLE FUNCTION: hex netfn is %s ' % hex(request["netfn"]) + 'and command is %s' % str.format('0x{:02X}', int(str(request["command"]), 16)))
         authkeys = list(self.authdata.keys())
         if request['netfn'] == 6 and request['command'] == 0x3b:
             # set session privilage level
@@ -431,11 +433,18 @@ class IpmiServerContext(object):
 
             self.session._send_ipmi_net_payload(code=returncode)
             logger.info('IPMI response sent (Set User Password) to %s', self.session.sockaddr)
+        # to conver between these commands and the IPMI formatted hex:
+        # >>> hex(44)
+        # '0x2c'
+        # >>> print(0x2c)
+        # 44
+        # Or most accurately
+        # str.format('0x{:02X}', int('44', 16))
         elif request['netfn'] in [0, 6] and request['command'] in [1, 2, 8, 9]:
-            logger.debug('Hit main handler: IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
+            logger.debug('main handler: IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
             self.bmc.handle_raw_request(request, self.session)
-        elif request['netfn'] in [6, 10] and request['command'] in [66, 65, 16, 17]:
-            logger.error('lol')
+        #TODO this is so lazy, this all needs to be a real mixin    
+        elif request['netfn'] in [6, 10, 12] and request['command'] in [66, 65, 16, 17,2]:
             FakeBmc.custom_handle_raw_request(self, request, self.session)
             #returncode = 0xc1
             #self.session._send_ipmi_net_payload(code=returncode)            
