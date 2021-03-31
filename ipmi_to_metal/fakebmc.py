@@ -76,6 +76,10 @@ logger.addHandler(ch)
 METAL_AUTH_TOKEN = os.getenv("METAL_AUTH_TOKEN")
 METAL_SERVER_UUID = os.getenv("METAL_SERVER_UUID")
 METAL_SERVER_IPXE_URL = os.getenv("METAL_SERVER_IPXE_URL")
+METAL_SERVER_IPMI_IP = os.getenv("METAL_SERVER_IPMI_IP")
+METAL_SERVER_IPMI_GW_IP = os.getenv("METAL_SERVER_IPMI_GW_IP")
+
+
 if METAL_AUTH_TOKEN is None:
     logger.error("OS ENV variable METAL_AUTH_TOKEN= must be set")
     sys.exit(1)
@@ -85,6 +89,12 @@ elif METAL_SERVER_UUID is None:
 elif METAL_SERVER_IPXE_URL is None:
     logger.error("OS ENV variable METAL_SERVER_IPXE_URL= must be set")
     sys.exit(1)
+elif METAL_SERVER_IPMI_IP is None:
+    logger.error("OS ENV variable METAL_SERVER_IPMI_IP= must be set")
+    sys.exit(1)    
+elif METAL_SERVER_IPMI_GW_IP is None:
+    logger.error("OS ENV variable METAL_SERVER_IPMI_GW_IP= must be set")
+    sys.exit(1)   
 
 manager = packet.Manager(auth_token=METAL_AUTH_TOKEN)
 
@@ -285,7 +295,7 @@ class FakeBmc(Bmc):
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x04 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=get_lan_4())
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x03 in request.get("data"):
-                    self.session._send_ipmi_net_payload(data=get_lan_5())                    
+                    self.session._send_ipmi_net_payload(data=get_lan_5()) #this function is ipmi lan IP
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x06 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=get_lan_6())
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x05 in request.get("data"):
@@ -299,7 +309,7 @@ class FakeBmc(Bmc):
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x0b in request.get("data"):
                     self.session._send_ipmi_net_payload(code=0x80)  # get_lan_11 shortcut                  
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x0c in request.get("data"):
-                    self.session._send_ipmi_net_payload(data=get_lan_12())
+                    self.session._send_ipmi_net_payload(data=get_lan_12()) # func is ipmi GW ip
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x0d in request.get("data"):
                     self.session._send_ipmi_net_payload(data=get_lan_13())
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x0e in request.get("data"):
@@ -626,14 +636,19 @@ def get_lan_4():
     return lan_data4
     
 def get_lan_5():
-    lan_data5 = [
-        0x11,
-        0x0a,
-        0xfa,
-        0x1f, 
-        0x7a,        
+    ipmi_ip = METAL_SERVER_IPMI_IP
+
+    ip_response_data = [ 
+        0x11,     
     ]
-    return lan_data5
+    # https://stackoverflow.com/a/41225217
+    for portion in ipmi_ip.split('.'):
+        logger.debug(portion)
+        portion_to_hex = hex(int(portion)+256)[3:]
+        logger.debug(int(portion_to_hex, 16))
+        ip_response_data.append(int(portion_to_hex, 16))
+    #ip_response_data.append(int(hex(int(x)+256)[3:] for x in ipmi_ip.split('.')), 16)
+    return ip_response_data
 
 def get_lan_6():
     lan_data6 = [
@@ -699,6 +714,21 @@ def get_lan_10():
     return lan_data10
 
 def get_lan_12():
+    ipmi_gw_ip = METAL_SERVER_IPMI_GW_IP
+
+    ip_response_data = [ 
+        0x11,     
+    ]
+    # https://stackoverflow.com/a/41225217
+    for portion in ipmi_gw_ip.split('.'):
+        portion_to_hex = hex(int(portion)+256)[3:]
+        ip_response_data.append(int(portion_to_hex, 16))
+    #ip_response_data.append(int(hex(int(x)+256)[3:] for x in ipmi_ip.split('.')), 16)
+    return ip_response_data
+
+
+
+
     lan_data12 = [
         0x11,
         0x0a,

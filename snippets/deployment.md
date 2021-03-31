@@ -36,10 +36,14 @@ This doc is intended to provide a deployment guide for the not_ipmi_to_metal ser
         export METAL_AUTH_TOKEN=$(YOUR_RW_METAL_TOKEN_HERE) && \
         export METAL_SERVER_UUID=$(YOUR_METAL_INSTANCE_UUID_HERE) && \
         export METAL_SERVER_IPXE_URL=$(YOUR_PXE_IPXE_FILE) && \ 
+        export METAL_SERVER_IPMI_IP=$(IPMI ENDPOINT IP) && \
+        export METAL_SERVER_IPMI_GW_IP=$(IPMI ENDPOINT IP +1) && \ 
         docker run -d --name ipmi_to_metal_$SERVER_HUMAN_NAME \
-		-e METAL_AUTH_TOKEN=$METAL_AUTH_TOKEN \
-		-e METAL_SERVER_UUID=$METAL_SERVER_UUID \
-		-e METAL_SERVER_IPXE_URL=$METAL_SERVER_IPXE_URL \
+        -e METAL_AUTH_TOKEN=$METAL_AUTH_TOKEN \
+        -e METAL_SERVER_UUID=$METAL_SERVER_UUID \
+        -e METAL_SERVER_IPXE_URL=$METAL_SERVER_IPXE_URL \
+        -e METAL_SERVER_IPMI_IP=$METAL_SERVER_IPMI_IP \
+        -e METAL_SERVER_IPMI_GW_IP=$METAL_SERVER_IPMI_GW_IP \        
         -p $(ELASTIC_IP_HERE):623:623/udp \
         ipmi_to_metal:latest
         ```
