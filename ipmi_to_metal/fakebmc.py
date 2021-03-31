@@ -643,11 +643,8 @@ def get_lan_5():
     ]
     # https://stackoverflow.com/a/41225217
     for portion in ipmi_ip.split('.'):
-        logger.debug(portion)
         portion_to_hex = hex(int(portion)+256)[3:]
-        logger.debug(int(portion_to_hex, 16))
         ip_response_data.append(int(portion_to_hex, 16))
-    #ip_response_data.append(int(hex(int(x)+256)[3:] for x in ipmi_ip.split('.')), 16)
     return ip_response_data
 
 def get_lan_6():
@@ -723,7 +720,6 @@ def get_lan_12():
     for portion in ipmi_gw_ip.split('.'):
         portion_to_hex = hex(int(portion)+256)[3:]
         ip_response_data.append(int(portion_to_hex, 16))
-    #ip_response_data.append(int(hex(int(x)+256)[3:] for x in ipmi_ip.split('.')), 16)
     return ip_response_data
 
 
