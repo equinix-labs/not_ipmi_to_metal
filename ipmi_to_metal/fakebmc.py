@@ -78,7 +78,7 @@ METAL_SERVER_UUID = os.getenv("METAL_SERVER_UUID")
 METAL_SERVER_IPXE_URL = os.getenv("METAL_SERVER_IPXE_URL")
 METAL_SERVER_IPMI_IP = os.getenv("METAL_SERVER_IPMI_IP")
 METAL_SERVER_IPMI_GW_IP = os.getenv("METAL_SERVER_IPMI_GW_IP")
-
+METAL_SERVER_IPMI_MAC = os.getenv("METAL_SERVER_IPMI_MAC")
 
 if METAL_AUTH_TOKEN is None:
     logger.error("OS ENV variable METAL_AUTH_TOKEN= must be set")
@@ -95,6 +95,10 @@ elif METAL_SERVER_IPMI_IP is None:
 elif METAL_SERVER_IPMI_GW_IP is None:
     logger.error("OS ENV variable METAL_SERVER_IPMI_GW_IP= must be set")
     sys.exit(1)   
+elif METAL_SERVER_IPMI_MAC is None:
+    logger.error("OS ENV variable METAL_SERVER_IPMI_MAC= must be set")
+    sys.exit(1)   
+
 
 manager = packet.Manager(auth_token=METAL_AUTH_TOKEN)
 
@@ -299,7 +303,7 @@ class FakeBmc(Bmc):
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x06 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=get_lan_6())
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x05 in request.get("data"):
-                    self.session._send_ipmi_net_payload(data=get_lan_7())
+                    self.session._send_ipmi_net_payload(data=get_lan_7()) # ipmi mac
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x10 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=get_lan_8())
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x07 in request.get("data"):
@@ -658,16 +662,19 @@ def get_lan_6():
     return lan_data6
     
 def get_lan_7():
-    lan_data7 = [
-        0x11,
-        0xac,
-        0x1f,
-        0x6b, 
-        0x7f,        
-        0x44, 
-        0xfa,                
+    ipmi_mac = METAL_SERVER_IPMI_MAC
+
+    mac_response_data = [ 
+        0x11,     
     ]
-    return lan_data7
+    #str.format('0x{:02X}'
+    for portion in ipmi_mac.split(':'):
+        logger.error(str.format('0x{0}', portion))
+        # nothing is really being hexed here, str format to int
+        portion_to_hex = str.format('0x{0}', portion)
+        mac_response_data.append(int(portion_to_hex, 16))
+    return mac_response_data
+
     
 def get_lan_8():
     lan_data8 = [
