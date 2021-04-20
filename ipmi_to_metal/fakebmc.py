@@ -266,26 +266,29 @@ class FakeBmc(Bmc):
             elif request["command"] == 0x11: # 0x0a 0x11 (automatic subcall of 0x42)
                 # all of this is fru print 0, fru list currently still broken
                 zeros_number = len([num for num in request.get("data") if num == 0x00])
+                twenty_number = len([num for num in request.get("data") if num == 0x20])
                 if zeros_number == 3 and 0x08 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data1())                
                 elif zeros_number == 2 and 0x08 in request.get("data") and 0x02 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data2())
-                elif zeros_number == 2 and 0x08 in request.get("data") and 0x20 in request.get("data"):
+                elif zeros_number == 2 and 0x08 in request.get("data") and 0x18 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data3())
-                elif zeros_number == 2 and 0x08 in request.get("data") and 0x28 in request.get("data"):
+                elif zeros_number == 2 and 0x20 in request.get("data") and 0x02 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data4())
-                elif zeros_number == 2 and 0x02 in request.get("data") and 0x30 in request.get("data"):
+                elif zeros_number == 2 and twenty_number == 2:
                     self.session._send_ipmi_net_payload(data=read_fru_data5())
-                elif zeros_number == 2 and 0x20 in request.get("data") and 0x30 in request.get("data"):
+                elif zeros_number == 2 and 0x40 in request.get("data") and 0x20 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data6())                    
-                elif zeros_number == 2 and 0x10 in request.get("data") and 0x50 in request.get("data"):
+                elif zeros_number == 2 and 0x60 in request.get("data") and 0x18 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data7())
-                elif zeros_number == 2 and 0x60 in request.get("data") and 0x02 in request.get("data"):
+                elif zeros_number == 2 and 0x78 in request.get("data") and 0x02 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data8())
-                elif zeros_number == 2 and 0x60 in request.get("data") and 0x20 in request.get("data"):
+                elif zeros_number == 2 and 0x78 in request.get("data") and 0x20 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data9())
-                elif zeros_number == 2 and 0x80 in request.get("data") and 0x20 in request.get("data"):
+                elif zeros_number == 2 and 0x98 in request.get("data") and 0x20 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data10())
+                elif zeros_number == 2 and 0xb8 in request.get("data") and 0x10 in request.get("data"): # begin air(private note)
+                    self.session._send_ipmi_net_payload(data=read_fru_data11())                    
         elif request['netfn'] == 12:
             if request["command"] == 0x02: # 0x0c 0x02 
                 zeros_number = len([num for num in request.get("data") if num == 0x00]) 
@@ -385,11 +388,11 @@ def read_fru_data1():
         0x01,
         0x00,
         0x01,
-        0x06,
-        0x0c,
+        0x04,
+        0x0f,
         0x00,
         0x00,
-        0xec,
+        0xeb,
     ]
     return fru_data1
 
@@ -397,132 +400,151 @@ def read_fru_data2():
     fru_data2 = [
         0x02,
         0x01,
-        0x05,
+        0x03,
     ]
     return fru_data2
     
 def read_fru_data3():
     fru_data3 = [
-        0x20,
+        0x18,
         0x01,
-        0x05,
-        0x01,
-        0xd1,
+        0x03,
+        0x17,
+        0x00,
+        0xcd,
+        0x51,
+        0x54,
+        0x46,
         0x43,
-        0x53,
-        0x45,
-        0x2d,
-        0x39,
-        0x33,
-        0x39,
-        0x48,
-        0x53,
-        0x2d,
-        0x52,
-        0x32,
-        0x4b,
-        0x30,
-        0x34,
-        0x42,
-        0x50,
-        0xcf,
+        0x4f,
         0x43,
-        0x39,
-        0x33,
-        0x39,
-        0x30,
-        0x41,
-        0x48,
-        0x31,
         0x37,
-        0x41,
+        0x31,
+        0x35,
+        0x30,
+        0x32,
+        0x31,
+        0x45,
+        0xc1,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x22,
     ]
     return fru_data3
 
 def read_fru_data4():
     fru_data4 = [
-        0x08,
-        0x34,
-        0x30,
-        0x30,
-        0x31,
-        0x37,
-        0xc1,
-        0x00,
-        0x18,
-
+        0x02,
+        0x01,
+        0x0b,
     ]
     return fru_data4
 
 def read_fru_data5():
     fru_data5 = [
-        0x31,
-        0x39,
-        0x31,
+        0x20,
+        0x01,
+        0x0b,
+        0x19,
+        0x79,
+        0xe9,
+        0xaa,
+        0xd3,
+        0x51,
+        0x75,
+        0x61,
+        0x6e,
+        0x74,
+        0x61,
+        0x20,
+        0x43,
+        0x6f,
+        0x6d,
+        0x70,
+        0x75,
+        0x74,
+        0x65,
+        0x72,
+        0x20,
+        0x49,
+        0x6e,
+        0x63,
+        0xd5,
         0x53,
-        0x30,
         0x32,
-        0x38,        
+        0x42,
+        0x50,        
+        0x2d,
     ]
     return fru_data5
     
 def read_fru_data6():
     fru_data6 = [
         0x20,
-        0x01,
-        0x06,
-        0x00,
-        0x80,
-        0x3e,
-        0xb9,
-        0xca,
-        0x53,
-        0x75,
-        0x70,
-        0x65,
-        0x72,
-        0x6d,
-        0x69,
-        0x63,
-        0x72,
-        0x6f,
-        0xc4,
-        0x4e,
-        0x4f,
-        0x4e,
-        0x45,
-        0xcc,
-        0x5a,
         0x4d,
+        0x42,
+        0x20,
+        0x28,
+        0x64,
+        0x75,
+        0x61,
+        0x6c,
+        0x20,
         0x31,
-        0x39,
-        0x31,
-        0x53,
-        0x30,
-        0x32,
-        0x38,
+        0x47,
+        0x20,
+        0x4c,
+        0x6f,
+        0x4d,
+        0x29, 
+        0xce, 
+        0x51, 
+        0x54, 
+        0x46, 
+        0x35, 
+        0x4f, 
+        0x43, 
+        0x37, 
+        0x31, 
+        0x34, 
+        0x30, 
+        0x30, 
+        0x33, 
+        0x31, 
+        0x34,
+        0xcb,
     ]
     return fru_data6
     
 def read_fru_data7():
     fru_data7 = [
-        0x10,
+        0x18,
+        0x33,
+        0x31,
+        0x53,
         0x32,
-        0x36,
+        0x42,
+        0x4d,
+        0x42,
+        0x30,
+        0x30,
         0x35,
-        0xc8,
-        0x58,
+        0x30,
+        0xc3,
         0x31,
-        0x31,
-        0x53,
-        0x53,
-        0x45,
-        0x2d,
-        0x46,
+        0x2e,
+        0x34,
         0xc0,
+        0xc0,
+        0xc2,
+        0x38,
+        0x30,
         0xc1,
         0x00,
-        0xa2,
+        0x00,
+        0x4b,
     ]
     return fru_data7
 
@@ -530,86 +552,108 @@ def read_fru_data8():
     fru_data8 = [
         0x02,
         0x01,
-        0x08,
+        0x0a,
     ]
     return fru_data8
     
 def read_fru_data9():
     fru_data9 = [
-        0x20,
-        0x01,
-        0x08,
-        0x00,
-        0xca,
-        0x53,
+        0x20, 
+        0x01, 
+        0x0a, 
+        0x19, 
+        0xd3,
+        0x51,
         0x75,
+        0x61,
+        0x6e,
+        0x74,
+        0x61,
+        0x20,
+        0x43, 
+        0x6f, 
+        0x6d, 
         0x70,
+        0x75, 
+        0x74, 
         0x65,
         0x72,
-        0x6d,
-        0x69,
+        0x20,
+        0x49,
+        0x6e,
         0x63,
-        0x72,
-        0x6f,
-        0xc4,
-        0x4e,
-        0x4f,
-        0x4e,
-        0x45,
-        0xd1,
-        0x53,
-        0x50,
-        0x53,
+        0xd6,
+        0x44,
+        0x35, 
+        0x31, 
+        0x42, 
+        0x50, 
         0x2d,
-        0x35,
-        0x30,
-        0x33,
-        0x39,
-        0x4d,
-        0x53,
-        0x2d,
-        0x48,
+        0x31,
+        0x55,
     ]
     return fru_data9
     
 def read_fru_data10():
-    logger.debug('read_fru_data10 reached, `fru print 0` should be complete')
     fru_data10 = [
-        0x20,
-        0x31,
-        0x32,
-        0x54,
-        0x52,
+        0x20, 
+        0x20, 
+        0x28, 
+        0x64, 
+        0x75, 
+        0x61, 
+        0x6c, 
+        0x20, 
+        0x31, 
+        0x47, 
+        0x20, 
+        0x4c, 
+        0x6f, 
+        0x4d, 
+        0x29, 
+        0xcb,
+        0x32, 
+        0x30, 
+        0x53, 
+        0x32, 
+        0x42, 
+        0x42, 
+        0x55, 
+        0x30, 
+        0x32, 
+        0x4b, 
+        0x30, 
+        0x00, 
+        0xcd, 
+        0x51, 
+        0x54, 
         0x46,
-        0xc4,
-        0x4e,
-        0x4f,
-        0x4e,
-        0x45,
-        0xcf,
-        0x53,
-        0x32,
-        0x31,
-        0x31,
-        0x36,
-        0x37,
-        0x38,
-        0x58,
-        0x39,
-        0x32,
-        0x32,
-        0x36,
-        0x34,
-        0x38,
-        0x37,
-        0xc0,
-        0xc0,
-        0xc1,
-        0x00,
-        0x00,
-        0x80,
+        0x43,
     ]
     return fru_data10
+    
+def read_fru_data11():
+    logger.debug('read_fru_data11 reached, `fru print 0` should be complete')
+    fru_data11 = [
+        0x10, 
+        0x4f, 
+        0x43, 
+        0x37, 
+        0x31, 
+        0x35, 
+        0x30, 
+        0x32, 
+        0x31, 
+        0x45, 
+        0x00, 
+        0xc3, 
+        0x31, 
+        0x2e, 
+        0x34, 
+        0xc1,
+        0xd9,
+    ]
+    return fru_data11    
 
 def get_lan_1():
     lan_data1 = [

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script ingests the output of a "-vv" ipmi call, and replays it with raw calls and records the raw commands
+# This script ingests the output of a "-vv" ipmi call, and replays it with raw calls and records the raw return
 # This functionally lets us collect the back and forth stream of an ipmi call
 # example: ipmitool -vv -I lanplus -H 10.250.31.122 -U ADMIN -P ADMIN fru print 0 > /tmp/ipmi_out 2>&1
 
