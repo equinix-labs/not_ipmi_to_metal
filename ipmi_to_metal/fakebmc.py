@@ -456,9 +456,13 @@ def read_fru_data4():
 
 def read_fru_data5():
     fru_data5 = [
-        0x02,
-        0x01,
-        0x06,
+        0x31,
+        0x39,
+        0x31,
+        0x53,
+        0x30,
+        0x32,
+        0x38,        
     ]
     return fru_data5
     
