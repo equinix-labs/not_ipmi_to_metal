@@ -253,7 +253,7 @@ class FakeBmc(Bmc):
     def custom_handle_raw_request(self, request, session):
         
         global virtualmedia
-        logger.debug('Custom Handler command is %s', str.format('0x{:02X}', int(str(request["command"]), 16)))
+        logger.debug('CUSTOM HANDLER command is %s', str.format('0x{:02X}', int(str(request["command"]), 16)))
         #try:
         if request['netfn'] == 6:
             # Channel info
@@ -342,15 +342,13 @@ class FakeBmc(Bmc):
                     self.session._send_ipmi_net_payload(code=0x80)  # get_lan_21 shortcut
         elif request['netfn'] == 60: # 0x3c, special / secret virtualmedia ipmi path for supermicro based lifecycle controllers. This is all undocumented
             if request['command'] == 0x03: # This is the get virtualmedia mount status command '0x3c 0x03'
-                logger.debug('LOL1')
+                logger.info("IPMI request for virtualmedia status received, status: %s", virtualmedia)
                 if virtualmedia == 'mounted':
                     # Hex for ' 00\n'
                     self.session._send_ipmi_net_payload(data=[0x20, 0x30, 0x30, 0x0d, 0x0a]) 
                 elif virtualmedia == 'dismounted':
-                    logger.debug('LOL2')
                     self.session._send_ipmi_net_payload(code=0x00)
                 else:
-                    logger.debug('LOL3')
                     self.session._send_ipmi_net_payload(code=0x00)
             elif request['command'] == 0x01:
                 # This should come after but this is stupid python class / attribute stuff
