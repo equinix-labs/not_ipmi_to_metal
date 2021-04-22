@@ -441,15 +441,15 @@ class IpmiServerContext(object):
         # Or most accurately
         # str.format('0x{:02X}', int('44', 16))
         elif request['netfn'] in [0, 6] and request['command'] in [1, 2, 8, 9]:
-            logger.debug('main handler: IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
             self.bmc.handle_raw_request(request, self.session)
-        #TODO this is so lazy, this all needs to be a real mixin    
-        elif request['netfn'] in [6, 10, 12] and request['command'] in [66, 65, 16, 17,2]:
+        #TODO this is so lazy bad, this all needs to be a real mixin    
+        elif request['netfn'] in [6, 10] and request['command'] in [66, 65, 16, 17]:
             FakeBmc.custom_handle_raw_request(self, request, self.session)
             #returncode = 0xc1
             #self.session._send_ipmi_net_payload(code=returncode)            
+        elif request['netfn'] in [60, 12]:
+            FakeBmc.custom_handle_raw_request(self, request, self.session)
         elif request['netfn'] in [44] and request['command'] in [62, 0]:
-            logger.info('IPMI request netfn is %s,' % request['netfn'] + 'request command is %s' % request['command'])
             logger.debug('IPMI is asking for user access stuff not yet implemented')
             returncode = 0xc1
             self.session._send_ipmi_net_payload(code=returncode)

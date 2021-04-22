@@ -101,7 +101,7 @@ elif METAL_SERVER_IPMI_MAC is None:
 
 
 manager = packet.Manager(auth_token=METAL_AUTH_TOKEN)
-
+virtualmedia = 'mounted'
 
 class FakeBmc(Bmc):
 
@@ -251,7 +251,9 @@ class FakeBmc(Bmc):
     # https://opendev.org/x/pyghmi/src/branch/master/pyghmi/ipmi/bmc.py#L162
 
     def custom_handle_raw_request(self, request, session):
-        logger.debug(' Custom Handler command is %s', str.format('0x{:02X}', int(str(request["command"]), 16)))
+        server = manager.get_device(METAL_SERVER_UUID)
+        global virtualmedia
+        logger.debug('Custom Handler command is %s', str.format('0x{:02X}', int(str(request["command"]), 16)))
         #try:
         if request['netfn'] == 6:
             # Channel info
@@ -268,6 +270,7 @@ class FakeBmc(Bmc):
                 zeros_number = len([num for num in request.get("data") if num == 0x00])
                 twenty_number = len([num for num in request.get("data") if num == 0x20])
                 if zeros_number == 3 and 0x08 in request.get("data"):
+                    logger.info('IPMI fru print 0 called likely')
                     self.session._send_ipmi_net_payload(data=read_fru_data1())                
                 elif zeros_number == 2 and 0x08 in request.get("data") and 0x02 in request.get("data"):
                     self.session._send_ipmi_net_payload(data=read_fru_data2())
@@ -294,6 +297,7 @@ class FakeBmc(Bmc):
                 zeros_number = len([num for num in request.get("data") if num == 0x00]) 
                 ones_number = len([num for num in request.get("data") if num == 0x01])
                 if zeros_number == 3 and 0x01 in request.get("data"):
+                    logger.info('IPMI lan print called likely')
                     self.session._send_ipmi_net_payload(data=get_lan_1())
                 elif zeros_number == 2 and ones_number == 2:
                     self.session._send_ipmi_net_payload(data=get_lan_2())
@@ -335,14 +339,38 @@ class FakeBmc(Bmc):
                     self.session._send_ipmi_net_payload(data=get_lan_20())
                 elif zeros_number == 2 and 0x01 in request.get("data") and 0x1a in request.get("data"):
                     logger.debug('ipmi client request lan print should be complete')
-                    self.session._send_ipmi_net_payload(code=0x80)  # get_lan_21 shortcut    
-                    
-        # except:
-           # logger.error('Shouldnt be here')
+                    self.session._send_ipmi_net_payload(code=0x80)  # get_lan_21 shortcut
+        elif request['netfn'] == 60: # 0x3c, special / secret virtualmedia ipmi path for supermicro based lifecycle controllers. This is all undocumented
+            if request['command'] == 0x03: # This is the get virtualmedia mount status command '0x3c 0x03'
+                logger.debug('LOL1')
+                if virtualmedia == 'mounted':
+                    # Hex for ' 00\n'
+                    self.session._send_ipmi_net_payload(data=[0x20, 0x30, 0x30, 0x0d, 0x0a]) 
+                elif virtualmedia == 'dismounted':
+                    logger.debug('LOL2')
+                    self.session._send_ipmi_net_payload(code=0x00)
+                else:
+                    logger.debug('LOL3')
+                    self.session._send_ipmi_net_payload(code=0x00)
+            elif request['command'] == 0x01:
+                # This should come after but this is stupid python class / attribute stuff
+                self.session._send_ipmi_net_payload(code=0x00)
+                server = manager.get_device(METAL_SERVER_UUID)
+                # This is the virtual media set NFS image command for SuperMicro, data payloads are around that. Impossible to predict incoming data payload as it will be dynamic as in:
+                # 0x3c 0x01 0x02 %s 0x00' %(self.hex_convert(image_filename)
+                server.ipxe_script_url = METAL_SERVER_IPXE_URL
+                server.always_pxe = True
+                server.update()
+                virtualmedia = 'mounted'
+                logger.info("IPMI request for virtualmedia set received, iPXE enabled")
+            elif request['command'] == 0x00: 
+                self.session._send_ipmi_net_payload(code=0x00)
+                server = manager.get_device(METAL_SERVER_UUID)
+                server.always_pxe = False
+                server.update()
+                virtualmedia = 'dismounted'
+                logger.info("IPMI request for virtualmedia UNSET received, iPXE disabled")
 
-# All of this needs to be rewritten as a map dict lookup for data
-# Include that in an OEM fru / sdr / lan model, potentiall lift phyghmi's 
-        
         
 #Taken from 
 # https://github.com/kurokobo/virtualbmc-for-vsphere/blob/master/vbmc4vsphere/vbmc.py#L350
@@ -717,7 +745,6 @@ def get_lan_7():
     ]
     #str.format('0x{:02X}'
     for portion in ipmi_mac.split(':'):
-        logger.error(str.format('0x{0}', portion))
         # nothing is really being hexed here, str format to int
         portion_to_hex = str.format('0x{0}', portion)
         mac_response_data.append(int(portion_to_hex, 16))
