@@ -368,6 +368,9 @@ class FakeBmc(Bmc):
                 server.update()
                 virtualmedia = 'dismounted'
                 logger.info("IPMI request for virtualmedia UNSET received, iPXE disabled")
+            elif request['command'] == 0x02: # start virtualmedia against configured NFS mount
+                self.session._send_ipmi_net_payload(code=0x00)
+                logger.info("IPMI request for virtualmedia nfs start received")
 
         
 #Taken from 
