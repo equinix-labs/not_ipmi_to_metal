@@ -251,7 +251,7 @@ class FakeBmc(Bmc):
     # https://opendev.org/x/pyghmi/src/branch/master/pyghmi/ipmi/bmc.py#L162
 
     def custom_handle_raw_request(self, request, session):
-        server = manager.get_device(METAL_SERVER_UUID)
+        
         global virtualmedia
         logger.debug('Custom Handler command is %s', str.format('0x{:02X}', int(str(request["command"]), 16)))
         #try:
