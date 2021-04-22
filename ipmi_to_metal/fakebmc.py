@@ -342,10 +342,10 @@ class FakeBmc(Bmc):
                     self.session._send_ipmi_net_payload(code=0x80)  # get_lan_21 shortcut
         elif request['netfn'] == 60: # 0x3c, special / secret virtualmedia ipmi path for supermicro based lifecycle controllers. This is all undocumented
             if request['command'] == 0x03: # This is the get virtualmedia mount status command '0x3c 0x03'
-                logger.info("IPMI request for virtualmedia status received, status: %s", virtualmedia)
+                logger.info("IPMI request for virtualmedia nfs status received, status: %s", virtualmedia)
                 if virtualmedia == 'mounted':
                     # Hex for ' 00\n'
-                    self.session._send_ipmi_net_payload(data=[0x30, 0x30]) 
+                    self.session._send_ipmi_net_payload(data=[0x00, 0x00]) 
                 elif virtualmedia == 'dismounted':
                     self.session._send_ipmi_net_payload(code=0x00)
                 else:
@@ -360,14 +360,14 @@ class FakeBmc(Bmc):
                 server.always_pxe = True
                 server.update()
                 virtualmedia = 'mounted'
-                logger.info("IPMI request for virtualmedia set received, iPXE enabled")
+                logger.info("IPMI request for virtualmedia nfs set received, iPXE enabled")
             elif request['command'] == 0x00: 
                 self.session._send_ipmi_net_payload(code=0x00)
                 server = manager.get_device(METAL_SERVER_UUID)
                 server.always_pxe = False
                 server.update()
                 virtualmedia = 'dismounted'
-                logger.info("IPMI request for virtualmedia UNSET received, iPXE disabled")
+                logger.info("IPMI request for virtualmedia nfs UNSET received, iPXE disabled")
             elif request['command'] == 0x02: # start virtualmedia against configured NFS mount
                 self.session._send_ipmi_net_payload(code=0x00)
                 logger.info("IPMI request for virtualmedia nfs start received")
