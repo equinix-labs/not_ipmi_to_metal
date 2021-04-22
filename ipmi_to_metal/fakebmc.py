@@ -345,7 +345,7 @@ class FakeBmc(Bmc):
                 logger.info("IPMI request for virtualmedia status received, status: %s", virtualmedia)
                 if virtualmedia == 'mounted':
                     # Hex for ' 00\n'
-                    self.session._send_ipmi_net_payload(data=[0x20, 0x30, 0x30, 0x5c, 0x6e]) 
+                    self.session._send_ipmi_net_payload(data=[0x30, 0x30, 0x5c, 0x6e]) 
                 elif virtualmedia == 'dismounted':
                     self.session._send_ipmi_net_payload(code=0x00)
                 else:
