@@ -6,9 +6,9 @@
 To be explicit, the code quality of this repo should be considered *hackathon* grade. This repo is purely for exploratory and collaborative purposes.
 
 
-[Quick Deployment Guide](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/snippets/deployment.md)
+[Quick Deployment Guide](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/docs/deployment.md)
 
-[Development Intent](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/snippets/development.md)
+[Development Intent](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/docs/development.md)
 
 [Equinix Metal](https://metal.equinix.com/), as an Infrastructure as a Service cloud, provides single-tenant, Bare Metal Servers as on-demand, cloudy provisioned compute & storage instances. In the world of "Bare Metal", [IPMI](https://en.wikipedia.org/wiki/Intelligent_Platform_Management_Interface) is often used as a control-plane protocol and actor for [managing](https://www.thomas-krenn.com/en/wiki/Setup_the_IPMI_remote_management_interface) the physical characteristics of a chassis; power on, power off, reboot, sensor data etc. Those IPMI actions are normally targetted at the "lifecycle controller" of a server chassis, for example with a Dell chassis this would be the [iDRAC](https://en.wikipedia.org/wiki/Dell_DRAC) card, for HPE it's [iLO](https://en.wikipedia.org/wiki/HP_Integrated_Lights-Out), and for SuperMicro it's confusingly enough [IPMI](https://www.supermicro.com/en/solutions/management-software/ipmi-utilities). 
 
