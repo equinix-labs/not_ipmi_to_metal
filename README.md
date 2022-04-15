@@ -2,10 +2,10 @@
 
 `not_ipmi_to_metal` is an emulated IPMI server / endpoint and BMC that receives native IPMIv2.0 lanplus formatted requests and proxies the intended action against the Equinix Metal API, functionally allowing for the control of an Equinix Metal instance via tools like `ipmitool` and `ironic`.
 
-![Equinix Metal Website](https://img.shields.io/badge/Website%3A-metal.equinix.com-blue)(https://metal.equinix.com)
+[![Equinix Metal Website](https://img.shields.io/badge/Website%3A-metal.equinix.com-blue)](https://metal.equinix.com)
 ![Actively Maintained](https://img.shields.io/badge/Maintenance%20Level-Actively%20Maintained-green.svg)
-![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)(https://www.python.org/)
-![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)(https://opensource.org/licenses/Apache-2.0)
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 The intent of the utility is to provide a de-coupling between software stacks that are IPMI control dependant, allowing those software stacks to control Equinix Metal instance's without software re-writes.
 
@@ -19,7 +19,7 @@ usage: not_ipmi_to_metal [-h] [--port PORT] [--user IPMIUSER] [--password IPMIPA
 Pretend to be a Metal instances BMC and proxy IPMI commands to the Metal API. Note some variables can be set by ENV
 
 optional arguments:
-  -h, --help            show this help message and exit
+  -h, --help            show this help message and exit 
   --port PORT           (UDP) port to listen on (default: 623)
   --user IPMIUSER       IPMI username to expect (default: admin)
   --password IPMIPASS   IPMI password to expect (default: password)
