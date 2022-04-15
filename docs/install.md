@@ -7,7 +7,7 @@ It can also be built locally with the correct container toolchain locally by che
 It is expected that the container toolchain of choice (docker, podman etc) is already installed and correctly configured for container deployments.
 
 * [Docker Install Documentation](https://docs.docker.com/engine/install/ubuntu/)
-* [Podman Install Documentation] (https://podman.io/getting-started/installation)
+* [Podman Install Documentation](https://podman.io/getting-started/installation)
 
 ## no-code podman host
 
@@ -111,8 +111,11 @@ dlotterman/not_ipmi_to_metal:v3
 
 `$ python3 -m venv ./ not_ipmi_to_metal`
 
-```$ source bin/activate
-(tmp)```
+```
+$ source bin/activate
+(tmp)
+
+```
 
 ```
 $ pip3 install --upgrade pip
@@ -130,7 +133,6 @@ Successfully installed pip-22.0.4
 $ pip3 install -r requirements.txt
 ...
 ```
-
 
 ```
 $ sudo cat > /etc/systemd/system/not_ipmi_to_metal_testv3.service <<EOF

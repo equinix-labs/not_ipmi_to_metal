@@ -1,13 +1,13 @@
 # not_ipmi_to_metal
 
-`not_ipmi_to_metal` is an emulated IPMI server / endpoint that receives native IPMIv2.0 lanplus formatted requests and proxies the intended action against the Equinix Metal API, functionally allowing for the control of an Equinix Metal instance via tools like `ipmitool`.
+`not_ipmi_to_metal` is an emulated IPMI server / endpoint and BMC that receives native IPMIv2.0 lanplus formatted requests and proxies the intended action against the Equinix Metal API, functionally allowing for the control of an Equinix Metal instance via tools like `ipmitool` and `ironic`.
 
-[![Equinix Metal Website](https://img.shields.io/badge/Website%3A-metal.equinix.com-blue)
-[![Actively Maintained](https://img.shields.io/badge/Maintenance%20Level-Actively%20Maintained-green.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
-[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+![Equinix Metal Website](https://img.shields.io/badge/Website%3A-metal.equinix.com-blue)
+![Actively Maintained](https://img.shields.io/badge/Maintenance%20Level-Actively%20Maintained-green.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
+![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-The intent is to provide a de-coupling between software stacks that are IPMI control dependant, allowing those software stacks to control Equinix Metal instance's without software re-writes.
+The intent of the utility is to provide a de-coupling between software stacks that are IPMI control dependant, allowing those software stacks to control Equinix Metal instance's without software re-writes.
 
 It is not intended to be a fully featured IPMI endpoint/ BMC / Lifecycle Controller, and is singularly focused on `chassis bootdev` and `chassis power` contexts.
 
@@ -50,7 +50,7 @@ optional arguments:
 
 `not_ipmi_to_metal` is intended to be deployed as a application container, and should be deployeable via `docker`, `podman` or `containerd`
 
-`not_ipmi_to_metal` is available as a hosted container via Docker Hub
+`not_ipmi_to_metal` is available as a hosted container via [Docker Hub](https://hub.docker.com/r/dlotterman/not_ipmi_to_metal)
 
 [More detailed installation steps detailed here](docs/install.md)
 
