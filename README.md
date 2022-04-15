@@ -1,26 +1,78 @@
 # not_ipmi_to_metal
 
+`not_ipmi_to_metal` is an emulated IPMI server / endpoint that receives native IPMIv2.0 lanplus formatted requests and proxies the intended action against the Equinix Metal API, functionally allowing for the control of an Equinix Metal instance via tools like `ipmitool`.
 
-`not_ipmi_to_metal` is a fake IPMI server / endpoint that takes the hard work and logic from [shapeblue/ipmisim](https://github.com/shapeblue/ipmisim) and wraps+extends it in a way as to function as an "inbound IPMI request to Metal API / SSH / openipmi / other" proxy.
+[![Equinix Metal Website](https://img.shields.io/badge/Website%3A-metal.equinix.com-blue)
+[![Actively Maintained](https://img.shields.io/badge/Maintenance%20Level-Actively%20Maintained-green.svg)](https://gist.github.com/cheerfulstoic/d107229326a01ff0f333a1d3476e068d)
+[![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-To be explicit, the code quality of this repo should be considered *hackathon* grade. This repo is purely for exploratory and collaborative purposes.
+The intent is to provide a de-coupling between software stacks that are IPMI control dependant, allowing those software stacks to control Equinix Metal instance's without software re-writes.
+
+It is not intended to be a fully featured IPMI endpoint/ BMC / Lifecycle Controller, and is singularly focused on `chassis bootdev` and `chassis power` contexts.
+
+```
+$ python not_ipmi_to_metal/not_ipmi_to_metal.py --help
+usage: not_ipmi_to_metal [-h] [--port PORT] [--user IPMIUSER] [--password IPMIPASS] [--metaltoken METALTOKEN]
+                         [--metaluuid METALUUID]
+
+Pretend to be a Metal instances BMC and proxy IPMI commands to the Metal API. Note some variables can be set by ENV
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --port PORT           (UDP) port to listen on (default: 623)
+  --user IPMIUSER       IPMI username to expect (default: admin)
+  --password IPMIPASS   IPMI password to expect (default: password)
+  --metaltoken METALTOKEN
+                        Equinix Metal Read / Write API Token, will get from ENV METAL_AUTH_TOKEN if unset (default:
+                        None)
+  --metaluuid METALUUID
+                        UUID of the Equinix Metal instance, will get from METAL_INSTANCE_UUID if unset (default: None)
+```
 
 
-[Quick Deployment Guide](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/docs/deployment.md)
+```
+2022-04-15 18:04:50,204 - not_ipmi_to_metal - INFO - not_metal_to_ipmi service for instance UUID: 87b9b0ac-dd7e-4a9d-b156-6736d57d6364 starting on port 623
+2022-04-15 18:05:01,065 - not_ipmi_to_metal - INFO - IPMI BMC Power_On request.
+2022-04-15 18:05:02,297 - not_ipmi_to_metal - INFO - IPMI BMC Power_On request.
+2022-04-15 18:05:24,771 - not_ipmi_to_metal - INFO - IPMI BMC Power_Off request.
+```
 
-[Development Intent](https://github.com/dlotterman/not_ipmi_to_metal/blob/main/docs/development.md)
+## Credits and references
 
-[Equinix Metal](https://metal.equinix.com/), as an Infrastructure as a Service cloud, provides single-tenant, Bare Metal Servers as on-demand, cloudy provisioned compute & storage instances. In the world of "Bare Metal", [IPMI](https://en.wikipedia.org/wiki/Intelligent_Platform_Management_Interface) is often used as a control-plane protocol and actor for [managing](https://www.thomas-krenn.com/en/wiki/Setup_the_IPMI_remote_management_interface) the physical characteristics of a chassis; power on, power off, reboot, sensor data etc. Those IPMI actions are normally targetted at the "lifecycle controller" of a server chassis, for example with a Dell chassis this would be the [iDRAC](https://en.wikipedia.org/wiki/Dell_DRAC) card, for HPE it's [iLO](https://en.wikipedia.org/wiki/HP_Integrated_Lights-Out), and for SuperMicro it's confusingly enough [IPMI](https://www.supermicro.com/en/solutions/management-software/ipmi-utilities). 
+* The [first incarnation of this utility](https://github.com/dlotterman/not_ipmi_to_metal/tree/4c9193f3319e3af798ff03e717672a463209ff4a) lifted heavily from [shapeblue/ipmisim](https://github.com/shapeblue/ipmisim/tree/main/ipmisim)
+* The current incarnation of this utility lifts heavily from [open/stack/virtualvbmc](https://github.com/openstack/virtualbmc)
+* The real heavy lifting of this utility comes from the [pyghmi](https://opendev.org/x/pyghmi) project
+* This utility levarages the [Equinix Metal Python Library](https://opendev.org/x/pyghmi)
+* The Equinix Metal API is [well documented here](https://metal.equinix.com/developers/api/)
 
-By nature of being a Bare Metal cloud, Equinix Metal isolates and removes network access to this lifecycle controller for a variety of reasons, including it's own automation needs as well as security and operational concerns. Instead of providing raw IPMI acess, Metal exposes an [HTTP API](https://metal.equinix.com/developers/api/) which provides analogous [functionality](https://metal.equinix.com/developers/api/devices/#devices-performAction), which is more than sufficient for most kinds of Metal deployments. 
+## Installation
 
-By nature of being a Bare Metal cloud, Equinix Metal isolates and removes network access to this lifecycle controller for a variety of reasons, including it's own automation needs as well as security and operational concerns. Instead of providing raw IPMI access, Metal exposes an HTTP API which provides analogous functionality, which is more than sufficient for most kinds of Metal deployments. However this is problematic for software stacks dependant on having IPMI access to the lifecycle controller. Software stacks such as OpenStack for example with it's Ironic package for example, expect IPMI direct access to a chassis lifecycle controller, as management of underlying physical hardware is a core concern of that stack.
+`not_ipmi_to_metal` is intended to be deployed as a application container, and should be deployeable via `docker`, `podman` or `containerd`
 
-This is problematic for software stacks dependant on having netwok enabled IPMI access to the lifecycle controller. Software stacks such as OpenStack with it's Ironic package expect direct IPMI access to a chassis lifecycle controller, as management of underlying physical hardware is a core concern of that architecure.
+`not_ipmi_to_metal` is available as a hosted container via Docker Hub
 
-`not_ipmi_to_metal` will act as an exploratory shim, allowing IPMI requests that would normally be directed at a Bare Metal instance's lifecycle controller to instead be mimicked against a variety of endpoints in order to best match feature functionality, including the Metal API itself. The intent is to provide
+[More detailed installation steps detailed here](docs/install.md)
 
-1) A potential way of loosening the tight coupling on IPMI access dependant on some stacks for the purposes of evaluating Equinix Metal. 
-    * For organizations looking to potentially deploy workloads onto Equinix Metal, it can often be burdensome to evaluate the platform without de-coupling the requirement for IPMI access. Leveraging this as a non-production shim, it should be possible to evaluate what a non-IPMI coupled deployment would look like.
+## Getting help and support
 
-2) Learn more about the operational realities of deploying *this kind of thing* and the potential requirements of a more permanent, supportable `ipmi_to_metal`
+`not_ipmi_to_metal` is entirely self-supported from an end operator perspective, and no active support is provided. Please feel free to reach out to the repository owner with questions, concerns or requests.
+
+To be explicit, this project is not affiliated with Equinix Metal and is not supported by Equinix Metal in any way.
+
+
+## Versioning
+
+Versioning is elementary. Current version is maintained in the `version` [file at the root of this repository](version), where Docker tags will reference that version.
+
+## Diagram
+
+![](https://s3.us-east-1.wasabisys.com/metalstaticassets/not_ipmi_to_metal_openstack.JPG)
+
+## TODO
+
+* Equinix Metal `packet-python` usage should be classed or libbed
+    * More pythonic
+    * try / except to better handle API failures in context
+* Expose a more elegant [custom handler like we had here](https://github.com/dlotterman/not_ipmi_to_metal/blob/12f44ce81337ee47e7c197db95d51fb30f4d194f/ipmi_to_metal/fakebmc.py#L253)
+
