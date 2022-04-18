@@ -75,4 +75,5 @@ Versioning is elementary. Current version is maintained in the `version` [file a
     * More pythonic
     * try / except to better handle API failures in context
 * Expose a more elegant [custom handler like we had here](https://github.com/dlotterman/not_ipmi_to_metal/blob/12f44ce81337ee47e7c197db95d51fb30f4d194f/ipmi_to_metal/fakebmc.py#L253)
+* Add `tests`, they should include building `ipmitool` from upstream source as [that is what pushed this to base](https://github.com/shapeblue/ipmisim/issues/12) of `pyghmi` instead of `ipmisim`
 
