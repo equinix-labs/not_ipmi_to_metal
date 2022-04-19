@@ -43,7 +43,7 @@ optional arguments:
 * The [first incarnation of this utility](https://github.com/dlotterman/not_ipmi_to_metal/tree/4c9193f3319e3af798ff03e717672a463209ff4a) lifted heavily from [shapeblue/ipmisim](https://github.com/shapeblue/ipmisim/tree/main/ipmisim)
 * The current incarnation of this utility lifts heavily from [open/stack/virtualvbmc](https://github.com/openstack/virtualbmc)
 * The real heavy lifting of this utility comes from the [pyghmi](https://opendev.org/x/pyghmi) project
-* This utility levarages the [Equinix Metal Python Library](https://opendev.org/x/pyghmi)
+* This utility levarages the [Equinix Metal Python Library](https://metal.equinix.com/developers/docs/libraries/python/)
 * The Equinix Metal API is [well documented here](https://metal.equinix.com/developers/api/)
 
 ## Installation
@@ -54,11 +54,11 @@ optional arguments:
 
 [More detailed installation steps detailed here](docs/install.md)
 
-## Getting help and support
+## Maintained Statement + Getting help and support
 
-`not_ipmi_to_metal` is entirely self-supported from an end operator perspective, and no active support is provided. Please feel free to reach out to the repository owner with questions, concerns or requests.
+`not_ipmi_to_metal` is a community maintained and developed project. The current owners are actively invested in maintaining the project in line with basic, reasonable expectations. Given that `ipmi` itself is a relatively static specification and ecosystem, no active development should be expected outside of `break / fix` style corrections.
 
-To be explicit, this project is not affiliated with Equinix Metal and is not supported by Equinix Metal in any way.
+`not_ipmi_to_metal` is entirely self-supported from an end operator perspective, and no active support is provided by Equinix or any other party.
 
 
 ## Versioning
