@@ -20,8 +20,11 @@ import sys
 import packet
 import logging
 import os
+import uuid
+import re
 
 import pyghmi.ipmi.bmc as bmc
+import library.handle_raw_request_custom
 
 logger = logging.getLogger('not_ipmi_to_metal')
 logger.setLevel(logging.DEBUG)
@@ -37,6 +40,7 @@ class metalbmc(bmc.Bmc):
 
     def __init__(self, authdata, port, metaltoken, metaluuid):
         super(metalbmc, self).__init__(authdata, port)
+        metalbmc.handle_raw_request = library.handle_raw_request_custom.handle_raw_request_patch
         logger.info(
             'not_metal_to_ipmi service for instance UUID: %s starting on port %s', metaluuid, port)
         self.state = 'on'
@@ -149,8 +153,124 @@ class metalbmc(bmc.Bmc):
                     'IPMI BMC could not poweroff instance via Metal API')
                 self.powerstate = 'unknown'
         self.powerstate = 'off'
-
         self.powerstate
+
+    #This is extremely broken. UUID version mismatches, very difficult
+    def get_system_guid(self, session):
+        response_data = []
+        for char in re.findall('..', uuid.UUID(self.metaluuid).hex):
+            portion_to_hex = str.format('0x{0}', char)
+            response_data.append(int(portion_to_hex, 16))
+        session.send_ipmi_response(code=0x00, data=response_data)
+
+    def get_fru_inventory_area_info(self, session):
+        logger.debug('get_fru_inventory_area_info requested')
+        fru_area_info = [
+            0x00,
+            0x08,
+            0x00,
+
+        ]
+        session.send_ipmi_response(code=0x00, data=fru_area_info)
+
+    def get_fru_0_0(self, session):
+        logger.debug('get_fru_0 requested')
+        fru_data_0_0 = [
+            0x08,
+            0x01,
+            0x00,
+            0x00,
+            0x01,
+            0x00,
+            0x00,
+            0x00,
+            0xfe,
+        ]
+        session.send_ipmi_response(data=fru_data_0_0)
+
+    def get_fru_0_1(self, session):
+        fru_data_0_1 = [
+            0x02,
+            0x01,
+            0x08,
+        ]
+        session.send_ipmi_response(data=fru_data_0_1)        
+
+    def get_fru_0_2(self, session):
+        fru_data_0_2 = [
+            0x20,
+            0x01,
+            0x08,
+            0x19,
+            0x00,
+            0x00,
+            0x00,
+            0xd8,
+            0x46, 
+            0x69, 
+            0x6c, 
+            0x6c, 
+            0x65, 
+            0x72, 
+            0x20, 
+            0x54,
+            0x65, 
+            0x78,
+            0x74,
+            0x31,
+            0x32, 
+            0x33, 
+            0x34, 
+            0x35, 
+            0x36, 
+            0x37, 
+            0x38, 
+            0x39, 
+            0x31, 
+            0x30, 
+            0x31, 
+            0x31,
+            0xc0,
+        ]
+        session.send_ipmi_response(data=fru_data_0_2)  
+
+    def get_fru_0_3(self, session):
+        fru_data_0_3 = [
+            0x20,
+            0xc0,
+            0xd9,
+            0x6e,
+            0x65,
+            0x77,
+            0x68,
+            0x6f,
+            0x73, 
+            0x74, 
+            0x2e, 
+            0x65, 
+            0x71, 
+            0x75, 
+            0x69, 
+            0x6e,
+            0x69, 
+            0x78,
+            0x6d,
+            0x65,
+            0x74, 
+            0x61, 
+            0x6c, 
+            0x2e, 
+            0x63, 
+            0x6f, 
+            0x6d, 
+            0x31, 
+            0xc0, 
+            0xc1, 
+            0x00, 
+            0x00,
+            0x7f,
+        ]
+        session.send_ipmi_response(data=fru_data_0_3)         
 
 
 def main():
@@ -197,4 +317,6 @@ def main():
 
 
 if __name__ == '__main__':
+    #bmc.handle_raw_request = library.handle_raw_request_custom.handle_raw_request_patch
+    library.handle_raw_request_custom.hahatestfunc1()
     sys.exit(main())
