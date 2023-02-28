@@ -163,7 +163,7 @@ class metalbmc(bmc.Bmc):
             response_data.append(int(portion_to_hex, 16))
         session.send_ipmi_response(code=0x00, data=response_data)
 
-    def get_fru_inventory_area_info(self, session):
+    def get_fru_inventory_area_info(self, session):    
         logger.debug('get_fru_inventory_area_info requested')
         fru_area_info = [
             0x00,
@@ -173,7 +173,9 @@ class metalbmc(bmc.Bmc):
         ]
         session.send_ipmi_response(code=0x00, data=fru_area_info)
 
-    def get_fru_0_0(self, session):
+### Board Mfg Date        : Sun Dec 31 16:00:00 1995
+### Board Part Number     : t3-small-x86-01
+    def get_fru_0_0(self, session):    
         logger.debug('get_fru_0 requested')
         fru_data_0_0 = [
             0x08,
@@ -194,9 +196,10 @@ class metalbmc(bmc.Bmc):
             0x01,
             0x08,
         ]
-        session.send_ipmi_response(data=fru_data_0_1)        
+        session.send_ipmi_response(data=fru_data_0_1)
 
     def get_fru_0_2(self, session):
+        ## Where this goes all 0x00 we could insert an arbitrary string
         fru_data_0_2 = [
             0x20,
             0x01,
@@ -206,71 +209,84 @@ class metalbmc(bmc.Bmc):
             0x00,
             0x00,
             0xd8,
-            0x46, 
-            0x69, 
-            0x6c, 
-            0x6c, 
-            0x65, 
-            0x72, 
-            0x20, 
-            0x54,
-            0x65, 
-            0x78,
-            0x74,
-            0x31,
-            0x32, 
-            0x33, 
-            0x34, 
-            0x35, 
-            0x36, 
-            0x37, 
-            0x38, 
-            0x39, 
-            0x31, 
-            0x30, 
-            0x31, 
-            0x31,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
             0xc0,
         ]
-        session.send_ipmi_response(data=fru_data_0_2)  
+        session.send_ipmi_response(data=fru_data_0_2)
 
     def get_fru_0_3(self, session):
+        metal_instance = self.metal_manager.get_device(self.metaluuid)
+        clean_hostname = metal_instance.hostname
         fru_data_0_3 = [
             0x20,
             0xc0,
             0xd9,
-            0x6e,
-            0x65,
-            0x77,
-            0x68,
-            0x6f,
-            0x73, 
-            0x74, 
-            0x2e, 
-            0x65, 
-            0x71, 
-            0x75, 
-            0x69, 
-            0x6e,
-            0x69, 
-            0x78,
-            0x6d,
-            0x65,
-            0x74, 
-            0x61, 
-            0x6c, 
-            0x2e, 
-            0x63, 
-            0x6f, 
-            0x6d, 
-            0x31, 
-            0xc0, 
-            0xc1, 
-            0x00, 
-            0x00,
-            0x7f,
         ]
-        session.send_ipmi_response(data=fru_data_0_3)         
+        for char in clean_hostname:
+            fru_data_0_3.append(int(char.encode('utf-8').hex(), 16))
+        current_fru_length = len(fru_data_0_3)
+        while len(fru_data_0_3) < 33:
+         ####   TODO, this is truly no bueno
+         ####   Were just padding the length of the response to the IPMI character break
+            fru_data_0_3.append(0x00)
+        fru_data_0_3.append(0x7f)
+
+            # 0x6e,
+            # 0x65,
+            # 0x77,
+            # 0x68,
+            # 0x6f,
+            # 0x73,
+            # 0x74,
+            # 0x2e,
+            # 0x65,
+            # 0x71,
+            # 0x75,
+            # 0x69,
+            # 0x6e,
+            # 0x69,
+            # 0x78,
+            # 0x6d,
+            # 0x65,
+            # 0x74,
+            # 0x61,
+            # 0x6c,
+            # 0x2e,
+            # 0x63,
+            # 0x6f,
+            # 0x6d,
+            # 0x31,
+            # 0xc0,
+            # 0xc1,
+            # 0x00,
+            # 0x00,
+            # 0x7f,
+        # ]
+
+        session.send_ipmi_response(data=fru_data_0_3)
 
 
 def main():
