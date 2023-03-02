@@ -45,24 +45,15 @@ def handle_raw_request_patch(self, request, session):
                 if zeros_number == 3 and 0x08 in request.get("data"):
                     logger.info("IPMI fru print 0 called likely")
                     return self.get_fru_0_0(session)
-                elif (
-                    zeros_number == 2
-                    and 0x08 in request.get("data")
-                    and 0x02 in request.get("data")
-                ):
+                elif (zeros_number == 2 and 0x08 in request.get("data")
+                      and 0x02 in request.get("data")):
                     return self.get_fru_0_1(session)
                 # elif zeros_number == 2 and 0x08 in request.get("data") and 0x18 in request.get("data"):
-                elif (
-                    zeros_number == 2
-                    and 0x08 in request.get("data")
-                    and 0x20 in request.get("data")
-                ):
+                elif (zeros_number == 2 and 0x08 in request.get("data")
+                      and 0x20 in request.get("data")):
                     return self.get_fru_0_2(session)
-                elif (
-                    zeros_number == 2
-                    and 0x28 in request.get("data")
-                    and 0x20 in request.get("data")
-                ):
+                elif (zeros_number == 2 and 0x28 in request.get("data")
+                      and 0x20 in request.get("data")):
                     return self.get_fru_0_3(session)
 
         else:

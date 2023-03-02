@@ -37,13 +37,13 @@ logger.addHandler(ch)
 
 
 class metalbmc(bmc.Bmc):
+
     def __init__(self, authdata, port, metaltoken, metaluuid):
         super(metalbmc, self).__init__(authdata, port)
         # Monkeypatch
         # Should make this optional so that only people who need FRU deviate from the pyghmi code path
         metalbmc.handle_raw_request = (
-            library.handle_raw_request_custom.handle_raw_request_patch
-        )
+            library.handle_raw_request_custom.handle_raw_request_patch)
         logger.info(
             "not_metal_to_ipmi service for instance UUID: %s starting on port %s",
             metaluuid,
@@ -241,12 +241,15 @@ class metalbmc(bmc.Bmc):
 def main():
     parser = argparse.ArgumentParser(
         prog="not_ipmi_to_metal",
-        description="Pretend to be a Metal instances BMC and proxy IPMI commands to the Metal API. Note some variables can be set by ENV",
+        description=
+        "Pretend to be a Metal instances BMC and proxy IPMI commands to the Metal API. Note some variables can be set by ENV",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument(
-        "--port", dest="port", type=int, default=623, help="(UDP) port to listen on"
-    )
+    parser.add_argument("--port",
+                        dest="port",
+                        type=int,
+                        default=623,
+                        help="(UDP) port to listen on")
     parser.add_argument(
         "--user",
         dest="ipmiuser",
@@ -266,14 +269,16 @@ def main():
         dest="metaltoken",
         type=str,
         default=os.environ.get("METAL_AUTH_TOKEN"),
-        help="Equinix Metal Read / Write API Token, will get from ENV METAL_AUTH_TOKEN if unset",
+        help=
+        "Equinix Metal Read / Write API Token, will get from ENV METAL_AUTH_TOKEN if unset",
     )
     parser.add_argument(
         "--metaluuid",
         dest="metaluuid",
         type=str,
         default=os.environ.get("METAL_INSTANCE_UUID"),
-        help="UUID of the Equinix Metal instance, will get from METAL_INSTANCE_UUID if unset",
+        help=
+        "UUID of the Equinix Metal instance, will get from METAL_INSTANCE_UUID if unset",
     )
     args = parser.parse_args()
     if not args.metaltoken or not args.metaluuid:
