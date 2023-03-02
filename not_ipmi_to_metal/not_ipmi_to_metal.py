@@ -247,45 +247,11 @@ class metalbmc(bmc.Bmc):
         ]
         for char in clean_hostname:
             fru_data_0_3.append(int(char.encode('utf-8').hex(), 16))
-        current_fru_length = len(fru_data_0_3)
         while len(fru_data_0_3) < 33:
          ####   TODO, this is truly no bueno
          ####   Were just padding the length of the response to the IPMI character break
             fru_data_0_3.append(0x00)
         fru_data_0_3.append(0x7f)
-
-            # 0x6e,
-            # 0x65,
-            # 0x77,
-            # 0x68,
-            # 0x6f,
-            # 0x73,
-            # 0x74,
-            # 0x2e,
-            # 0x65,
-            # 0x71,
-            # 0x75,
-            # 0x69,
-            # 0x6e,
-            # 0x69,
-            # 0x78,
-            # 0x6d,
-            # 0x65,
-            # 0x74,
-            # 0x61,
-            # 0x6c,
-            # 0x2e,
-            # 0x63,
-            # 0x6f,
-            # 0x6d,
-            # 0x31,
-            # 0xc0,
-            # 0xc1,
-            # 0x00,
-            # 0x00,
-            # 0x7f,
-        # ]
-
         session.send_ipmi_response(data=fru_data_0_3)
 
 

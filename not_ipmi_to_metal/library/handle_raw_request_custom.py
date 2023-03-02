@@ -13,13 +13,7 @@ formatter = logging.Formatter(
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-def hahatestfunc1():
-    print("hahatestfunc1")
-
 def handle_raw_request_patch(self, request, session):
-        print('HIT ME1HAHAHA')
-        print(request)
-        print(hex(request['command']))
         try:            
             if request['netfn'] == 6:
                 if request['command'] == 1:  # get device id
@@ -46,7 +40,6 @@ def handle_raw_request_patch(self, request, session):
                     return self.get_fru_inventory_area_info(session)
                 elif request["command"] == 0x11:
                     zeros_number = len([num for num in request.get("data") if num == 0x00])
-                    twenty_number = len([num for num in request.get("data") if num == 0x20])
                     if zeros_number == 3 and 0x08 in request.get("data"):
                         logger.info('IPMI fru print 0 called likely')
                         return self.get_fru_0_0(session)                   
@@ -65,6 +58,3 @@ def handle_raw_request_patch(self, request, session):
         except Exception:
             session._send_ipmi_net_payload(code=0xff)
             traceback.print_exc()
-
-#bmc.handle_raw_request = handle_raw_request_patch
-
