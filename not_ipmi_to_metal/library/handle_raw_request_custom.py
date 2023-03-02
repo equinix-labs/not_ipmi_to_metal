@@ -8,7 +8,8 @@ logger = logging.getLogger("not_ipmi_to_metal")
 logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
@@ -39,7 +40,8 @@ def handle_raw_request_patch(self, request, session):
             if request["command"] == 0x10:
                 return self.get_fru_inventory_area_info(session)
             elif request["command"] == 0x11:
-                zeros_number = len([num for num in request.get("data") if num == 0x00])
+                zeros_number = len(
+                    [num for num in request.get("data") if num == 0x00])
                 if zeros_number == 3 and 0x08 in request.get("data"):
                     logger.info("IPMI fru print 0 called likely")
                     return self.get_fru_0_0(session)

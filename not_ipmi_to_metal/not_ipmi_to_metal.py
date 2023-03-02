@@ -30,7 +30,8 @@ logger = logging.getLogger("not_ipmi_to_metal")
 logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler(sys.stdout)
 ch.setLevel(logging.DEBUG)
-formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
@@ -105,7 +106,8 @@ class metalbmc(bmc.Bmc):
             try:
                 metal_instance.power_off()
             except:
-                logging.critical("IPMI BMC could not poweroff instance via Metal API")
+                logging.critical(
+                    "IPMI BMC could not poweroff instance via Metal API")
                 self.powerstate = "unknown"
         self.powerstate = "off"
 
@@ -121,7 +123,8 @@ class metalbmc(bmc.Bmc):
                 metal_instance.power_on()
                 self.powerstate = "on"
             except:
-                logging.critical("IPMI BMC could not powerob instance via Metal API")
+                logging.critical(
+                    "IPMI BMC could not powerob instance via Metal API")
                 self.powerstate = "unknown"
         self.powerstate
 
@@ -152,7 +155,8 @@ class metalbmc(bmc.Bmc):
             try:
                 metal_instance.power_off()
             except:
-                logging.critical("IPMI BMC could not poweroff instance via Metal API")
+                logging.critical(
+                    "IPMI BMC could not poweroff instance via Metal API")
                 self.powerstate = "unknown"
         self.powerstate = "off"
         self.powerstate
@@ -170,8 +174,8 @@ class metalbmc(bmc.Bmc):
         fru_area_info = [0x00, 0x08, 0x00]
         session.send_ipmi_response(code=0x00, data=fru_area_info)
 
-    ### Board Mfg Date        : Sun Dec 31 16:00:00 1995
-    ### Board Part Number     : t3-small-x86-01
+    # Board Mfg Date        : Sun Dec 31 16:00:00 1995
+    # Board Part Number     : t3-small-x86-01
     def get_fru_0_0(self, session):
         logger.debug("get_fru_0 requested")
         fru_data_0_0 = [0x08, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xFE]
@@ -182,7 +186,7 @@ class metalbmc(bmc.Bmc):
         session.send_ipmi_response(data=fru_data_0_1)
 
     def get_fru_0_2(self, session):
-        ## Where this goes all 0x00 we could insert an arbitrary string
+        # Where this goes all 0x00 we could insert an arbitrary string
         fru_data_0_2 = [
             0x20,
             0x01,
@@ -227,8 +231,8 @@ class metalbmc(bmc.Bmc):
         for char in clean_hostname:
             fru_data_0_3.append(int(char.encode("utf-8").hex(), 16))
         while len(fru_data_0_3) < 33:
-            ####   TODO, this is truly no bueno
-            ####   Were just padding the length of the response to the IPMI character break
+            # TODO, this is truly no bueno
+            # Were just padding the length of the response to the IPMI character break
             fru_data_0_3.append(0x00)
         fru_data_0_3.append(0x7F)
         session.send_ipmi_response(data=fru_data_0_3)
