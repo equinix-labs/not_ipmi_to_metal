@@ -20,8 +20,11 @@ import sys
 import packet
 import logging
 import os
+import uuid
+import re
 
 import pyghmi.ipmi.bmc as bmc
+import library.handle_raw_request_custom
 
 logger = logging.getLogger('not_ipmi_to_metal')
 logger.setLevel(logging.DEBUG)
@@ -37,6 +40,9 @@ class metalbmc(bmc.Bmc):
 
     def __init__(self, authdata, port, metaltoken, metaluuid):
         super(metalbmc, self).__init__(authdata, port)
+        # Monkeypatch
+        # Should make this optional so that only people who need FRU deviate from the pyghmi code path
+        metalbmc.handle_raw_request = library.handle_raw_request_custom.handle_raw_request_patch
         logger.info(
             'not_metal_to_ipmi service for instance UUID: %s starting on port %s', metaluuid, port)
         self.state = 'on'
@@ -149,8 +155,106 @@ class metalbmc(bmc.Bmc):
                     'IPMI BMC could not poweroff instance via Metal API')
                 self.powerstate = 'unknown'
         self.powerstate = 'off'
-
         self.powerstate
+
+    #This is extremely broken. UUID version mismatches, very difficult
+    def get_system_guid(self, session):
+        response_data = []
+        for char in re.findall('..', uuid.UUID(self.metaluuid).hex):
+            portion_to_hex = str.format('0x{0}', char)
+            response_data.append(int(portion_to_hex, 16))
+        session.send_ipmi_response(code=0x00, data=response_data)
+
+    def get_fru_inventory_area_info(self, session):    
+        logger.debug('get_fru_inventory_area_info requested')
+        fru_area_info = [
+            0x00,
+            0x08,
+            0x00,
+
+        ]
+        session.send_ipmi_response(code=0x00, data=fru_area_info)
+
+### Board Mfg Date        : Sun Dec 31 16:00:00 1995
+### Board Part Number     : t3-small-x86-01
+    def get_fru_0_0(self, session):    
+        logger.debug('get_fru_0 requested')
+        fru_data_0_0 = [
+            0x08,
+            0x01,
+            0x00,
+            0x00,
+            0x01,
+            0x00,
+            0x00,
+            0x00,
+            0xfe,
+        ]
+        session.send_ipmi_response(data=fru_data_0_0)
+
+    def get_fru_0_1(self, session):
+        fru_data_0_1 = [
+            0x02,
+            0x01,
+            0x08,
+        ]
+        session.send_ipmi_response(data=fru_data_0_1)
+
+    def get_fru_0_2(self, session):
+        ## Where this goes all 0x00 we could insert an arbitrary string
+        fru_data_0_2 = [
+            0x20,
+            0x01,
+            0x08,
+            0x19,
+            0x00,
+            0x00,
+            0x00,
+            0xd8,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0x00,
+            0xc0,
+        ]
+        session.send_ipmi_response(data=fru_data_0_2)
+
+    def get_fru_0_3(self, session):
+        metal_instance = self.metal_manager.get_device(self.metaluuid)
+        clean_hostname = metal_instance.hostname
+        fru_data_0_3 = [
+            0x20,
+            0xc0,
+            0xd9,
+        ]
+        for char in clean_hostname:
+            fru_data_0_3.append(int(char.encode('utf-8').hex(), 16))
+        while len(fru_data_0_3) < 33:
+         ####   TODO, this is truly no bueno
+         ####   Were just padding the length of the response to the IPMI character break
+            fru_data_0_3.append(0x00)
+        fru_data_0_3.append(0x7f)
+        session.send_ipmi_response(data=fru_data_0_3)
 
 
 def main():

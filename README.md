@@ -48,6 +48,8 @@ optional arguments:
 
 ## Installation
 
+This project assumes a current `python3` install and works inside of a `virtualenv`, the Python that comes packaged with *Ubuntu 22.04* or *CentOS 8* or newer should work fine.
+
 `not_ipmi_to_metal` is intended to be deployed as a application container, and should be deployeable via `docker`, `podman` or `containerd`
 
 `not_ipmi_to_metal` is available as a hosted container via [Docker Hub](https://hub.docker.com/r/dlotterman/not_ipmi_to_metal)
