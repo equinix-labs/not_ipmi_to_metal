@@ -40,6 +40,8 @@ class metalbmc(bmc.Bmc):
 
     def __init__(self, authdata, port, metaltoken, metaluuid):
         super(metalbmc, self).__init__(authdata, port)
+        # Monkeypatch
+        # Should make this optional so that only people who need FRU deviate from the pyghmi code path
         metalbmc.handle_raw_request = library.handle_raw_request_custom.handle_raw_request_patch
         logger.info(
             'not_metal_to_ipmi service for instance UUID: %s starting on port %s', metaluuid, port)
@@ -299,6 +301,4 @@ def main():
 
 
 if __name__ == '__main__':
-    #bmc.handle_raw_request = library.handle_raw_request_custom.handle_raw_request_patch
-    library.handle_raw_request_custom.hahatestfunc1()
     sys.exit(main())
