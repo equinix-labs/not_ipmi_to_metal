@@ -2,6 +2,9 @@
 
 `not_ipmi_to_metal` is an emulated IPMI server / endpoint and BMC that receives native IPMIv2.0 lanplus formatted requests and proxies the intended action against the Equinix Metal API, functionally allowing for the control of an Equinix Metal instance via tools like `ipmitool` and `ironic`.
 
+# Note
+With the upcoming EoL of Equinix Metal on June 30, 2026, this repo is being archived on February 28, 2026.
+
 [![Equinix Metal Website](https://img.shields.io/badge/Website%3A-metal.equinix.com-blue)](https://metal.equinix.com)
 ![Actively Maintained](https://img.shields.io/badge/Maintenance%20Level-Actively%20Maintained-green.svg)
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)](https://www.python.org/)
